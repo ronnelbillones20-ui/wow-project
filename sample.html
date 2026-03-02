@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walking Spider Sketch</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0; /* Paper-like background */
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="spiderCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('spiderCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+    let spider = { x: canvas.width / 2, y: canvas.height / 2, angle: 0 };
+
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    class Leg {
+        constructor(index, side) {
+            this.index = index;
+            this.side = side; // -1 for left, 1 for right
+            this.angle = 0;
+        }
+
+        draw(sx, sy, spiderAngle) {
+            // Calculate leg joints using Sine waves for the "walking" look
+            const phase = Date.now() * 0.01;
+            const movement = Math.sin(phase + this.index * 0.8) * 0.5;
+            
+            // Base position of the leg on the body
+            const spread = 0.5 + (this.index * 0.2);
+            const legAngle = spiderAngle + (spread * this.side) + (movement * 0.2);
+            
+            // Elbow joint
+            const ex = sx + Math.cos(legAngle) * 30;
+            const ey = sy + Math.sin(legAngle) * 30;
+
+            // Foot position
+            const fx = ex + Math.cos(legAngle + (0.5 * this.side)) * 20;
+            const fy = ey + Math.sin(legAngle + (0.5 * this.side)) * 20;
+
+            // Draw the leg (Sketch style)
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#333";
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(ex, ey);
+            ctx.lineTo(fx, fy);
+            ctx.stroke();
+        }
+    }
+
+    const legs = [];
+    for (let i = 0; i < 4; i++) {
+        legs.push(new Leg(i, -1)); // Left legs
+        legs.push(new Leg(i, 1));  // Right legs
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Move spider toward mouse
+        const dx = mouse.x - spider.x;
+        const dy = mouse.y - spider.y;
+        spider.angle = Math.atan2(dy, dx);
+        
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > 5) {
+            spider.x += Math.cos(spider.angle) * 2;
+            spider.y += Math.sin(spider.angle) * 2;
+        }
+
+        // Draw Legs
+        legs.forEach(leg => leg.draw(spider.x, spider.y, spider.angle));
+
+        // Draw Body
+        ctx.beginPath();
+        ctx.fillStyle = "#222";
+        ctx.ellipse(spider.x, spider.y, 15, 12, spider.angle, 0, Math.PI * 2);
+        ctx.fill();
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+</body>
+</html>
