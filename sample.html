@@ -3,98 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Spider Sketch</title>
+    <title>Sketchy Snake Follower</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #fdfdfd; cursor: crosshair; }
-        canvas { display: block; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #e0e0e0; /* Grayish paper color */
+        }
+        canvas { 
+            display: block; 
+            filter: contrast(120%) brightness(90%); /* Makes it look more like graphite */
+        }
     </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
+<canvas id="snakeCanvas"></canvas>
 
 <script>
-    const canvas = document.getElementById('canvas');
+    const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
 
     let width, height;
-    let mouse = { x: 0, y: 0 };
-    // This array stores the history of where the mouse has been
-    let trail = []; 
-    const trailLength = 60; // How long the "snake" is
+    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    
+    // Snake properties
+    const numSegments = 40;
+    const segments = [];
+    const segmentDist = 8; // Distance between body parts
 
-    function resize() {
+    function init() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        mouse.x = width / 2;
-        mouse.y = height / 2;
-        // Pre-fill trail so it doesn't glitch at start
-        for(let i=0; i<trailLength; i++) trail[i] = {x: mouse.x, y: mouse.y};
+        
+        for (let i = 0; i < numSegments; i++) {
+            segments.push({ x: mouse.x, y: mouse.y });
+        }
     }
 
-    window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
     });
 
-    resize();
+    function update() {
+        // The head follows the mouse
+        segments[0].x += (mouse.x - segments[0].x) * 0.2;
+        segments[0].y += (mouse.y - segments[0].y) * 0.2;
 
-    function drawLeg(x, y, angle, index) {
-        const time = Date.now() * 0.01;
-        const side = index % 2 === 0 ? 1 : -1;
-        const wave = Math.sin(time + index * 0.5) * 0.5;
-        
-        const legAngle = angle + (Math.PI / 2 * side) + wave;
-        
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(0,0,0,0.6)";
-        ctx.lineWidth = 1;
-        ctx.moveTo(x, y);
-        // Joint
-        const jX = x + Math.cos(legAngle) * 20;
-        const jY = y + Math.sin(legAngle) * 20;
-        // Tip
-        const tX = jX + Math.cos(legAngle + 0.5 * side) * 15;
-        const tY = jY + Math.sin(legAngle + 0.5 * side) * 15;
-        
-        ctx.lineTo(jX, jY);
-        ctx.lineTo(tX, tY);
-        ctx.stroke();
+        // Each following segment chases the one before it
+        for (let i = 1; i < numSegments; i++) {
+            const seg = segments[i];
+            const prev = segments[i - 1];
+            
+            const dx = prev.x - seg.x;
+            const dy = prev.y - seg.y;
+            const angle = Math.atan2(dy, dx);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > segmentDist) {
+                seg.x = prev.x - Math.cos(angle) * segmentDist;
+                seg.y = prev.y - Math.sin(angle) * segmentDist;
+            }
+        }
     }
 
-    function animate() {
-        // Subtle "fading" trail effect for the drawing look
-        ctx.fillStyle = "rgba(253, 253, 253, 0.1)";
+    function draw() {
+        // Fading background creates the "trail" or "path" look
+        ctx.fillStyle = "rgba(224, 224, 224, 0.08)"; 
         ctx.fillRect(0, 0, width, height);
 
-        // Update trail: Add new mouse position to the front
-        trail.unshift({ x: mouse.x, y: mouse.y });
-        if (trail.length > trailLength) trail.pop();
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
-        // Draw the segments
-        // We iterate through the trail and draw "legs" every 5 points
-        for (let i = 0; i < trail.length; i += 6) {
-            const pos = trail[i];
-            const nextPos = trail[i + 1] || trail[i];
+        // Draw the body as a single sketchy line
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(40, 40, 40, 0.6)"; // Pencil color
+        ctx.lineWidth = 10;
+        
+        ctx.moveTo(segments[0].x, segments[0].y);
+        
+        for (let i = 1; i < segments.length; i++) {
+            // Add a tiny bit of "jitter" to make it look hand-drawn
+            const jitterX = (Math.random() - 0.5) * 1.5;
+            const jitterY = (Math.random() - 0.5) * 1.5;
+            ctx.lineTo(segments[i].x + jitterX, segments[i].y + jitterY);
             
-            // Calculate angle based on movement direction
-            const angle = Math.atan2(pos.y - nextPos.y, pos.x - nextPos.x);
-
-            // Draw legs at this segment
-            drawLeg(pos.x, pos.y, angle, i);
-            
-            // Draw body segment
+            // Gradually make the tail thinner
+            ctx.lineWidth = Math.max(1, 12 - i * 0.3);
+            ctx.stroke();
             ctx.beginPath();
-            ctx.fillStyle = "#111";
-            const size = 8 - (i * 0.1); // Get thinner toward the tail
-            ctx.arc(pos.x, pos.y, Math.max(1, size), 0, Math.PI * 2);
-            ctx.fill();
+            ctx.moveTo(segments[i].x + jitterX, segments[i].y + jitterY);
         }
 
-        requestAnimationFrame(animate);
+        // Draw the Head/Eyes
+        ctx.fillStyle = "#111";
+        ctx.beginPath();
+        ctx.arc(segments[0].x, segments[0].y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        requestAnimationFrame(() => {
+            update();
+            draw();
+        });
     }
 
-    animate();
+    init();
+    draw();
+
+    window.addEventListener('resize', init);
 </script>
 </body>
 </html>
