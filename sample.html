@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sketching Spider</title>
+    <title>Snake Spider Sketch</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #fafafa; }
-        canvas { display: block; touch-action: none; }
+        body { margin: 0; overflow: hidden; background: #fdfdfd; cursor: crosshair; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
@@ -17,88 +17,83 @@
     const ctx = canvas.getContext('2d');
 
     let width, height;
-    let spider = { x: 100, y: 100, angle: 0, speed: 2 };
-    let target = { x: 150, y: 150 }; // Initial target so it moves immediately
+    let mouse = { x: 0, y: 0 };
+    // This array stores the history of where the mouse has been
+    let trail = []; 
+    const trailLength = 60; // How long the "snake" is
 
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        // Keep target within bounds on resize
-        target.x = width / 2;
-        target.y = height / 2;
+        mouse.x = width / 2;
+        mouse.y = height / 2;
+        // Pre-fill trail so it doesn't glitch at start
+        for(let i=0; i<trailLength; i++) trail[i] = {x: mouse.x, y: mouse.y};
     }
 
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => {
-        target.x = e.clientX;
-        target.y = e.clientY;
-    });
-    
-    // Support for mobile/touch
-    window.addEventListener('touchmove', e => {
-        target.x = e.touches[0].clientX;
-        target.y = e.touches[0].clientY;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
     });
 
     resize();
 
-    function drawSpider(x, y, angle) {
-        const time = Date.now() * 0.008;
+    function drawLeg(x, y, angle, index) {
+        const time = Date.now() * 0.01;
+        const side = index % 2 === 0 ? 1 : -1;
+        const wave = Math.sin(time + index * 0.5) * 0.5;
         
-        // Draw 8 legs
-        ctx.strokeStyle = "rgba(0,0,0,0.7)";
-        ctx.lineWidth = 1.5;
-
-        for (let i = 0; i < 8; i++) {
-            const side = i < 4 ? 1 : -1;
-            const legIndex = i % 4;
-            
-            // Movement logic: The sine wave creates the "stepping"
-            const step = Math.sin(time + (legIndex * 1.5)) * 0.4;
-            const reach = 0.4 + (legIndex * 0.3);
-            const jointAngle = angle + (reach * side) + step;
-
-            const elbowX = x + Math.cos(jointAngle) * 25;
-            const elbowY = y + Math.sin(jointAngle) * 25;
-            const footX = elbowX + Math.cos(jointAngle + (0.8 * side)) * 20;
-            const footY = elbowY + Math.sin(jointAngle + (0.8 * side)) * 20;
-
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(elbowX, elbowY);
-            ctx.lineTo(footX, footY);
-            ctx.stroke();
-        }
-
-        // Body
+        const legAngle = angle + (Math.PI / 2 * side) + wave;
+        
         ctx.beginPath();
-        ctx.fillStyle = "#111";
-        ctx.ellipse(x, y, 12, 10, angle, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.6)";
+        ctx.lineWidth = 1;
+        ctx.moveTo(x, y);
+        // Joint
+        const jX = x + Math.cos(legAngle) * 20;
+        const jY = y + Math.sin(legAngle) * 20;
+        // Tip
+        const tX = jX + Math.cos(legAngle + 0.5 * side) * 15;
+        const tY = jY + Math.sin(legAngle + 0.5 * side) * 15;
+        
+        ctx.lineTo(jX, jY);
+        ctx.lineTo(tX, tY);
+        ctx.stroke();
     }
 
     function animate() {
-        // To make it look like a drawing, we DON'T clear the whole screen
-        // Instead, we draw a very faint white rectangle to slowly fade old frames
-        ctx.fillStyle = "rgba(250, 250, 250, 0.05)"; 
+        // Subtle "fading" trail effect for the drawing look
+        ctx.fillStyle = "rgba(253, 253, 253, 0.1)";
         ctx.fillRect(0, 0, width, height);
 
-        // Calculate direction to target
-        const dx = target.x - spider.x;
-        const dy = target.y - spider.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        // Update trail: Add new mouse position to the front
+        trail.unshift({ x: mouse.x, y: mouse.y });
+        if (trail.length > trailLength) trail.pop();
 
-        if (distance > 5) {
-            spider.angle = Math.atan2(dy, dx);
-            spider.x += Math.cos(spider.angle) * spider.speed;
-            spider.y += Math.sin(spider.angle) * spider.speed;
+        // Draw the segments
+        // We iterate through the trail and draw "legs" every 5 points
+        for (let i = 0; i < trail.length; i += 6) {
+            const pos = trail[i];
+            const nextPos = trail[i + 1] || trail[i];
+            
+            // Calculate angle based on movement direction
+            const angle = Math.atan2(pos.y - nextPos.y, pos.x - nextPos.x);
+
+            // Draw legs at this segment
+            drawLeg(pos.x, pos.y, angle, i);
+            
+            // Draw body segment
+            ctx.beginPath();
+            ctx.fillStyle = "#111";
+            const size = 8 - (i * 0.1); // Get thinner toward the tail
+            ctx.arc(pos.x, pos.y, Math.max(1, size), 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        drawSpider(spider.x, spider.y, spider.angle);
         requestAnimationFrame(animate);
     }
 
-    // Start the loop
     animate();
 </script>
 </body>
