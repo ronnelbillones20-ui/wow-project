@@ -2,32 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Countdown</title>
     <style>
         body {
-            margin: 0;
+            background-color: #121212;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
-            background-color: #ffffff;
-            font-family: sans-serif;
+            margin: 0;
+            color: #ff3333;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        .container {
+        .bomb-casing {
+            background: #2b2b2b;
+            padding: 40px;
+            border: 8px solid #444;
+            border-radius: 10px;
             text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
         }
 
-        h1 { color: #333; }
-        #timer { font-size: 3rem; font-weight: bold; color: #000; }
-        .done { color: green; }
+        #timer {
+            font-size: 5rem;
+            background: #000;
+            padding: 20px;
+            border: 2px solid #555;
+            letter-spacing: 5px;
+            margin: 20px 0;
+        }
+
+        /* Explosion effect class */
+        .exploded {
+            color: #ff9900;
+            animation: shake 0.5s infinite;
+            text-shadow: 0 0 20px #ff9900;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -2px) rotate(-1deg); }
+            100% { transform: translate(1px, 1px) rotate(1deg); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>OUT NA SOON</h1>
+    <div class="bomb-casing">
+        <div style="font-size: 1.5rem;">T-MINUS TO DEPARTURE</div>
         <div id="timer">00:00:00</div>
     </div>
 
@@ -38,8 +60,9 @@
             target.setHours(17, 30, 0, 0);
 
             if (now >= target) {
-                document.getElementById('timer').innerHTML = "OUT NA!!";
-                document.getElementById('timer').classList.add('done');
+                const timerEl = document.getElementById('timer');
+                timerEl.innerHTML = "BOOM!";
+                timerEl.classList.add('exploded');
                 return;
             }
 
