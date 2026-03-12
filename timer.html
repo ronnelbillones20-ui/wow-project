@@ -3,172 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uwian Na! ✨</title>
+    <title>Uwian Na! 🌿</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Modern Gradient Background */
+        /* Nature Background */
         body {
-            background: linear-gradient(135deg, #1f4068, #1b1b2f);
-            color: #ffffff;
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Important to keep the character from causing scrollbars */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            /* High-quality Nature Image */
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                        url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
         }
 
+        /* Glassmorphism Container */
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 3.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             z-index: 10;
-            transition: all 0.5s ease;
-        }
-
-        /* The Character Element (controlled by JS) */
-        #walking-character {
-            position: absolute;
-            width: 120px; /* Adjust size here */
-            z-index: 100; /* Keeps it above the container */
-            transition: transform 0.1s linear; /* Smooth visual flipping */
-            pointer-events: none; /* Allows clicks to pass through it */
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-        }
-
-        #walking-character img {
-            width: 100%;
         }
 
         h1 {
-            font-size: 3rem;
-            margin-bottom: 0;
-            color: #4caf50;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 300;
-            margin-bottom: 25px;
-            opacity: 0.8;
-            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            letter-spacing: 2px;
         }
 
         #timer {
             font-size: 6rem;
-            font-weight: 900;
+            font-weight: 800;
             font-family: 'Courier New', Courier, monospace;
-            color: #ffeb3b;
-            text-shadow: 0 0 25px rgba(255, 235, 59, 0.5);
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Falling Leaves Effect */
+        .leaf {
+            position: absolute;
+            top: -10%;
+            z-index: 1;
+            user-select: none;
+            cursor: default;
+            animation: fall 10s linear infinite;
+            color: #4caf50;
+            opacity: 0.6;
+            font-size: 20px;
+        }
+
+        @keyframes fall {
+            0% { top: -10%; transform: translateX(0) rotate(0deg); }
+            100% { top: 110%; transform: translateX(100px) rotate(360deg); }
         }
 
         /* Time is up state */
         .done {
-            color: #ff5252 !important;
-            animation: pulse 1s infinite alternate;
-            text-shadow: 0 0 30px rgba(255, 82, 82, 0.8) !important;
+            color: #a5d6a7 !important; /* Soft nature green */
+            animation: glow 1.5s ease-in-out infinite alternate;
         }
 
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.08); }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #4caf50; }
+            to { text-shadow: 0 0 20px #fff, 0 0 30px #81c784; }
         }
     </style>
 </head>
 <body>
 
-    <div id="walking-character">
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZrdjV3Znlscms1YnV1cnoxeG9iY25oZ2N1dHFuaGFnZjIydnh6ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/IcoYg1W1E4eE5vGueD/giphy.gif" alt="Walking Cartoon">
-    </div>
+    <div id="leaf-container"></div>
 
     <div class="container">
-        <h1>READY NA?</h1>
-        <p>REMAINING TIME UNTIL 5:30 PM</p>
+        <h1>MALAPIT NA</h1>
+        <p>TIME UNTIL 5:30 PM</p>
         <div id="timer">00:00:00</div>
     </div>
 
     <script>
-        // Character Movement Logic
-        const char = document.getElementById('walking-character');
-        let posX = Math.random() * (window.innerWidth - 120); // Initial random X
-        let posY = Math.random() * (window.innerHeight - 120); // Initial random Y
-        let speedX = 2; // Walking speed
-        let speedY = 1.5;
+        // Create falling leaves
+        const leafContainer = document.getElementById('leaf-container');
+        const leaves = ['🍃', '🌿', '🌱', '🍀'];
+        
+        function createLeaf() {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = Math.random() * 100 + 'vw';
+            leaf.style.animationDuration = Math.random() * 5 + 5 + 's';
+            leaf.innerText = leaves[Math.floor(Math.random() * leaves.length)];
+            leafContainer.appendChild(leaf);
 
-        // Apply initial position
-        char.style.left = posX + 'px';
-        char.style.top = posY + 'px';
-
-        function animateCharacter() {
-            if (fireworksTriggered) {
-                // When time is up, make the character 'celebrate' in the center
-                posX = (window.innerWidth / 2) - 60;
-                posY = (window.innerHeight / 2) - 60;
-                char.style.transform = 'scale(1)'; // Face forward/don't flip
-                char.style.left = posX + 'px';
-                char.style.top = posY + 'px';
-                return; // Stop the random walking
-            }
-
-            // Update Position
-            posX += speedX;
-            posY += speedY;
-
-            // Collision detection with the screen edges
-            if (posX + 120 > window.innerWidth || posX < 0) {
-                speedX = -speedX; // Reverse direction X
-            }
-            if (posY + 120 > window.innerHeight || posY < 0) {
-                speedY = -speedY; // Reverse direction Y
-            }
-
-            // Visual 'flip' when changing horizontal direction
-            if (speedX > 0) {
-                char.style.transform = 'scaleX(1)'; // Facing right
-            } else {
-                char.style.transform = 'scaleX(-1)'; // Facing left (flipped)
-            }
-
-            // Apply new position
-            char.style.left = posX + 'px';
-            char.style.top = posY + 'px';
-
-            requestAnimationFrame(animateCharacter);
+            // Remove leaf after it falls
+            setTimeout(() => {
+                leaf.remove();
+            }, 10000);
         }
 
-        // Start the walking animation
-        requestAnimationFrame(animateCharacter);
+        setInterval(createLeaf, 500);
 
-
-        // Timer & Celebration Logic
+        // Timer & Celebration
         let fireworksTriggered = false;
 
-        function launchFireworks() {
-            var duration = 15 * 1000; // 15 seconds
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        function launchCelebration() {
+            const end = Date.now() + (15 * 1000);
+            const colors = ['#ffffff', '#4caf50', '#81c784'];
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
 
-            var interval = setInterval(function() {
-                var timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-
-                var particleCount = 50 * (timeLeft / duration);
-                // Launch from random spots on the screen
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
         }
 
         function updateTimer() {
@@ -177,24 +157,20 @@
             target.setHours(17, 30, 0, 0);
 
             if (now >= target) {
-                document.getElementById('timer').innerHTML = "OUT NA!! 🏃‍♂️";
+                document.getElementById('timer').innerHTML = "OUT NA! 🌱";
                 document.getElementById('timer').classList.add('done');
                 
                 if (!fireworksTriggered) {
-                    launchFireworks();
-                    fireworksTriggered = true; // This will also stop the character from walking randomly
+                    launchCelebration();
+                    fireworksTriggered = true;
                 }
                 return;
             }
 
             const diff = target - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            const h = hours.toString().padStart(2, '0');
-            const m = minutes.toString().padStart(2, '0');
-            const s = seconds.toString().padStart(2, '0');
+            const h = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            const s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
 
             document.getElementById('timer').innerHTML = `${h}:${m}:${s}`;
         }
