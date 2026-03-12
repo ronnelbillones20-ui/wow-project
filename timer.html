@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uwian Na!</title>
+    <title>Uwian Na! ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Animated Gradient Background */
+        /* Pastel Animated Background */
         body {
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a1a);
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,59 +29,82 @@
         }
 
         .container {
+            position: relative;
             text-align: center;
-            background: rgba(45, 45, 45, 0.8);
-            backdrop-filter: blur(10px); /* Modern frosted glass effect */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
             padding: 3rem;
-            border-radius: 30px;
-            box-shadow: 0 0 50px rgba(76, 175, 80, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.5s ease;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             z-index: 10;
         }
 
+        /* The Anime Character Container */
+        .character-wrapper {
+            position: absolute;
+            top: -120px;
+            right: -50px;
+            width: 150px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .character-wrapper img {
+            width: 100%;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
         h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            color: #4caf50;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            font-size: 2.8rem;
+            margin-bottom: 0;
+            color: #fff;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
         }
 
         p {
-            font-size: 1.1rem;
-            opacity: 0.7;
-            letter-spacing: 2px;
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 20px;
         }
 
         #timer {
-            font-size: 5.5rem;
+            font-size: 5rem;
             font-weight: 900;
             font-family: 'Courier New', Courier, monospace;
-            margin-top: 20px;
-            color: #ffeb3b;
-            text-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
-        /* Animation for when it's time to go */
         .done {
-            color: #ff5252 !important;
-            animation: pulse 1s infinite alternate;
-            text-shadow: 0 0 30px rgba(255, 82, 82, 0.8) !important;
+            color: #ffeb3b !important;
+            animation: shake 0.5s infinite;
         }
 
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10px { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>UUWI KANA NAMAN</h1>
-        <p>TIME REMAINING UNTIL 5:30 PM</p>
+        <div class="character-wrapper">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueGZueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/C9x0nrkuYlqjC/giphy.gif" alt="Cute Anime">
+        </div>
+
+        <h1>READY KA NA?</h1>
+        <p>Countdown to 5:30 PM</p>
         <div id="timer">00:00:00</div>
     </div>
 
@@ -89,26 +112,29 @@
         let fireworksTriggered = false;
 
         function launchFireworks() {
-            var duration = 15 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            var duration = 30 * 1000; // 30 seconds of celebration!
+            var end = Date.now() + duration;
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+                });
 
-            var interval = setInterval(function() {
-                var timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
                 }
-
-                var particleCount = 50 * (timeLeft / duration);
-                // since particles fall down, start a bit higher than random
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+            }());
         }
 
         function updateTimer() {
@@ -117,10 +143,9 @@
             target.setHours(17, 30, 0, 0);
 
             if (now >= target) {
-                document.getElementById('timer').innerHTML = "OUT NA!";
+                document.getElementById('timer').innerHTML = "OUT NA!! 🏃‍♂️";
                 document.getElementById('timer').classList.add('done');
                 
-                // Trigger fireworks only once when target is hit
                 if (!fireworksTriggered) {
                     launchFireworks();
                     fireworksTriggered = true;
@@ -133,11 +158,11 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            const hDisplay = hours.toString().padStart(2, '0');
-            const mDisplay = minutes.toString().padStart(2, '0');
-            const sDisplay = seconds.toString().padStart(2, '0');
+            const h = hours.toString().padStart(2, '0');
+            const m = minutes.toString().padStart(2, '0');
+            const s = seconds.toString().padStart(2, '0');
 
-            document.getElementById('timer').innerHTML = `${hDisplay}:${mDisplay}:${sDisplay}`;
+            document.getElementById('timer').innerHTML = `${h}:${m}:${s}`;
         }
 
         setInterval(updateTimer, 1000);
