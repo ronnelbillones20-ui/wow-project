@@ -4,49 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uwian Na!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        /* Animated Gradient Background */
         body {
-            background-color: #1a1a1a;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a1a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
             text-align: center;
-            background: #2d2d2d;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid #4caf50;
+            background: rgba(45, 45, 45, 0.8);
+            backdrop-filter: blur(10px); /* Modern frosted glass effect */
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 0 50px rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            z-index: 10;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 10px;
             color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
         }
 
         p {
-            font-size: 1.2rem;
-            opacity: 0.8;
+            font-size: 1.1rem;
+            opacity: 0.7;
+            letter-spacing: 2px;
         }
 
         #timer {
-            font-size: 4rem;
-            font-weight: bold;
+            font-size: 5.5rem;
+            font-weight: 900;
             font-family: 'Courier New', Courier, monospace;
             margin-top: 20px;
             color: #ffeb3b;
+            text-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
         }
 
+        /* Animation for when it's time to go */
         .done {
             color: #ff5252 !important;
+            animation: pulse 1s infinite alternate;
+            text-shadow: 0 0 30px rgba(255, 82, 82, 0.8) !important;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
         }
     </style>
 </head>
@@ -54,42 +81,67 @@
 
     <div class="container">
         <h1>UUWI KANA NAMAN</h1>
-        <p>Remaining time until 5:30 PM:</p>
+        <p>TIME REMAINING UNTIL 5:30 PM</p>
         <div id="timer">00:00:00</div>
     </div>
 
     <script>
+        let fireworksTriggered = false;
+
+        function launchFireworks() {
+            var duration = 15 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
         function updateTimer() {
             const now = new Date();
-            
-            // Set the target to 5:30 PM today
             const target = new Date();
             target.setHours(17, 30, 0, 0);
 
-            // If it's already past 5:30 PM, show "Time to go!"
-            if (now > target) {
+            if (now >= target) {
                 document.getElementById('timer').innerHTML = "OUT NA!";
                 document.getElementById('timer').classList.add('done');
+                
+                // Trigger fireworks only once when target is hit
+                if (!fireworksTriggered) {
+                    launchFireworks();
+                    fireworksTriggered = true;
+                }
                 return;
             }
 
             const diff = target - now;
-
             const hours = Math.floor(diff / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            // Add leading zeros
-            const hDisplay = hours < 10 ? "0" + hours : hours;
-            const mDisplay = minutes < 10 ? "0" + minutes : minutes;
-            const sDisplay = seconds < 10 ? "0" + seconds : seconds;
+            const hDisplay = hours.toString().padStart(2, '0');
+            const mDisplay = minutes.toString().padStart(2, '0');
+            const sDisplay = seconds.toString().padStart(2, '0');
 
             document.getElementById('timer').innerHTML = `${hDisplay}:${mDisplay}:${sDisplay}`;
         }
 
-        // Update every second
         setInterval(updateTimer, 1000);
-        updateTimer(); // Initial call
+        updateTimer();
     </script>
 </body>
 </html>
