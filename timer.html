@@ -3,43 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uwian Na! 🌙</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>Simple Countdown</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #ffffff;
+            font-family: sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 { color: #333; }
+        #timer { font-size: 3rem; font-weight: bold; color: #000; }
+        .done { color: green; }
+    </style>
 </head>
 <body>
 
     <div class="container">
         <h1>OUT NA SOON</h1>
-        <p>COUNTDOWN TO 5:30 PM</p>
         <div id="timer">00:00:00</div>
     </div>
 
     <script>
-        // Generate particles
-        for(let i = 0; i < 20; i++) {
-            let particle = document.createElement('div');
-            particle.className = 'particle';
-            let size = Math.random() * 4 + 'px';
-            particle.style.width = size;
-            particle.style.height = size;
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.animationDelay = Math.random() * 15 + 's';
-            particle.style.background = `rgba(76, 175, 80, ${Math.random() * 0.5})`;
-            document.body.appendChild(particle);
-        }
-
-        let fireworksTriggered = false;
-
-        function triggerFireworks() {
-            const end = Date.now() + (15 * 1000);
-            (function frame() {
-                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.8 }, colors: ['#4caf50', '#ffffff', '#ffeb3b'] });
-                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#4caf50', '#ffffff', '#ffeb3b'] });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
-
         function updateTimer() {
             const now = new Date();
             const target = new Date();
@@ -48,7 +40,6 @@
             if (now >= target) {
                 document.getElementById('timer').innerHTML = "OUT NA!!";
                 document.getElementById('timer').classList.add('done');
-                if (!fireworksTriggered) { triggerFireworks(); fireworksTriggered = true; }
                 return;
             }
 
@@ -56,6 +47,7 @@
             const h = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
             const s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            
             document.getElementById('timer').innerHTML = `${h}:${m}:${s}`;
         }
 
