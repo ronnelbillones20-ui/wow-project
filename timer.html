@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bomb Timer</title>
+    <title>Shift Defuser</title>
     <style>
         body {
             background-color: #121212;
@@ -64,7 +64,7 @@
 <body>
 
     <div class="bomb-casing">
-        <div style="font-size: 1.5rem;">T-MINUS TO DEPARTURE</div>
+        <div style="font-size: 1.5rem; text-transform: uppercase;">Time until Clock-Out</div>
         <div id="timer">00:00:00</div>
     </div>
 
@@ -78,9 +78,8 @@
                 const body = document.body;
                 const timerEl = document.getElementById('timer');
                 
-                // Trigger visual effects
                 body.classList.add('detonate');
-                timerEl.innerHTML = "BOOM!";
+                timerEl.innerHTML = "CLOCK OUT!";
                 timerEl.classList.add('exploded');
                 return;
             }
