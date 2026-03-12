@@ -7,46 +7,34 @@ body {
     justify-content: center;
     font-family: 'Segoe UI', sans-serif;
     overflow: hidden;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-    background-size: cover;
-    background-position: center;
+    /* Removed the dark gradient overlay for a cleaner look */
+    background-color: #1a1a1a; 
 }
 
 .container {
     text-align: center;
-    background: rgba(15, 15, 15, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #0f0f0f; /* Solid background instead of transparent */
     padding: 4rem;
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+    border: 1px solid #333;
+    /* Removed box-shadow and backdrop-filter */
     z-index: 10;
-    /* Keeps the organic breathing movement */
-    animation: breathe 4s ease-in-out infinite;
-}
-
-/* Organic breathing movement */
-@keyframes breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
+    animation: none; /* Removed the breathing animation */
 }
 
 h1 { font-size: 2.2rem; margin-bottom: 5px; color: #4caf50; text-transform: uppercase; letter-spacing: 8px; font-weight: 300; }
 p { font-size: 1rem; color: #888; letter-spacing: 3px; margin-bottom: 30px; }
-#timer { font-size: 6.5rem; font-weight: 900; font-family: 'Courier New', monospace; color: #ffffff; text-shadow: 0 0 30px rgba(76, 175, 80, 0.3); }
 
-.done { color: #ffeb3b !important; animation: pulse-gold 2s infinite; }
-@keyframes pulse-gold {
-    0% { text-shadow: 0 0 10px #ffeb3b; transform: scale(1); }
-    50% { text-shadow: 0 0 40px #ffeb3b; transform: scale(1.05); }
-    100% { text-shadow: 0 0 10px #ffeb3b; transform: scale(1); }
+#timer { 
+    font-size: 6.5rem; 
+    font-weight: 900; 
+    font-family: 'Courier New', monospace; 
+    color: #ffffff; 
+    text-shadow: none; /* Removed the glow effect */
 }
 
-.particle { position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; animation: float-up 15s infinite linear; }
-@keyframes float-up {
-    from { transform: translateY(100vh) scale(1); opacity: 0; }
-    50% { opacity: 0.5; }
-    to { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-}
+/* Updated pulse class for the 'done' state to avoid glows/shadows */
+.done { color: #ffeb3b !important; animation: none; }
+
+/* You can also delete the .particle class and the float-up keyframes 
+   if you want to remove the floating light particles entirely. */
